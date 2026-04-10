@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+
+# Node
+node_modules
+
+# Next.js Build
+.next
+
+# Datenbank (wird zur Laufzeit erstellt)
+prisma/*.db
+prisma/*.db-journal
+data/
+
+# Uploads (werden zur Laufzeit befüllt)
+uploads/*
+!uploads/.gitkeep
+
+# Umgebungsvariablen (werden nie in das Image gebaut!)
+.env
+.env.*
+!.env.example
+
+# Entwicklung
+*.log
+.DS_Store
+Thumbs.db
+
+# Docker selbst
+Dockerfile
+docker-compose.yml
+docker-entrypoint.sh

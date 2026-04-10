@@ -1,0 +1,35 @@
+services:
+  kitahrm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kitahrm
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Datenbank (in persistentem Volume)
+      DATABASE_URL: "file:/app/data/production.db"
+      # WICHTIG: Vor dem ersten Start ändern!
+      NEXTAUTH_SECRET: "bitte-einen-langen-sicheren-wert-hier-eintragen"
+      NEXTAUTH_URL: "http://localhost:3000"
+      # Optionale Admin-Passwörter beim ersten Start (Standard: Admin123! / Manager123!)
+      # ADMIN_PASSWORD: "MeinSicheresPasswort!"
+      # MANAGER_PASSWORD: "MeinSicheresPasswort!"
+    volumes:
+      # SQLite-Datenbank dauerhaft speichern
+      - kitahrm_data:/app/data
+      # Hochgeladene Dokumente dauerhaft speichern
+      - kitahrm_uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/auth/session"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  kitahrm_data:
+    driver: local
+  kitahrm_uploads:
+    driver: local
