@@ -30,4 +30,3 @@ Thumbs.db
 # Docker selbst
 Dockerfile
 docker-compose.yml
-docker-entrypoint.sh
