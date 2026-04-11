@@ -1,17 +1,15 @@
-# PHP-Version für Strato (PHP 8.2)
-# Falls dein Strato-Paket PHP 8.3 nutzt, ändere die Zeile entsprechend
-AddHandler application/x-httpd-php82 .php
-
 Options -Indexes
 Options +FollowSymLinks
 
 RewriteEngine On
 
-# Statische Dateien in public/ direkt ausliefern
+# Serve existing static files directly from public/
 RewriteCond %{REQUEST_URI} !^/public/
 RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f
 RewriteRule ^(.*)$ public/$1 [L]
 
-# Alles andere an public/index.php weiterleiten
+# Forward all other requests to public/index.php
+# REDIRECT_URL will be set to the original REQUEST_URI so Laravel
+# can auto-detect the installation subdirectory.
 RewriteCond %{REQUEST_URI} !^/public/
-RewriteRule ^(.*)$ public/index.php [L]
+RewriteRule ^(.*)$ public/index.php [L,QSA]
