@@ -31,7 +31,11 @@ COPY . .
 RUN mkdir -p public
 
 # Generate Prisma JS client → node_modules/.prisma/client/ (linux-musl binary)
-RUN pnpm exec prisma generate
+# The explicit output= in schema.prisma ensures pnpm isolated-linker doesn't
+# redirect the generated files into its virtual store (.pnpm/).
+RUN pnpm exec prisma generate && \
+    test -d node_modules/.prisma/client || \
+    { echo "ERROR: node_modules/.prisma/client missing after prisma generate"; exit 1; }
 
 # Run migrations at BUILD TIME against a throw-away SQLite file.
 # The builder has the complete pnpm tree, so @prisma/engines is resolvable
