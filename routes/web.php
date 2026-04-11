@@ -8,6 +8,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\TrainingCategoryController;
 use App\Http\Controllers\TrainingCompletionController;
+use App\Http\Controllers\UserManagementController;
 
 // Auth routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -27,9 +28,20 @@ Route::middleware('auth')->group(function () {
 
     // Kitas
     Route::get('/kitas', [KitaController::class, 'index'])->name('kitas.index');
+    Route::get('/kitas/create', [KitaController::class, 'create'])->name('kitas.create')->middleware('role:ADMIN');
+    Route::post('/kitas', [KitaController::class, 'store'])->name('kitas.store')->middleware('role:ADMIN');
     Route::get('/kitas/{kita}', [KitaController::class, 'show'])->name('kitas.show');
     Route::get('/kitas/{kita}/edit', [KitaController::class, 'edit'])->name('kitas.edit')->middleware('role:ADMIN');
     Route::put('/kitas/{kita}', [KitaController::class, 'update'])->name('kitas.update')->middleware('role:ADMIN');
+    Route::delete('/kitas/{kita}', [KitaController::class, 'destroy'])->name('kitas.destroy')->middleware('role:ADMIN');
+
+    // User management (Admin only)
+    Route::get('/users', [UserManagementController::class, 'index'])->name('users.index')->middleware('role:ADMIN');
+    Route::get('/users/create', [UserManagementController::class, 'create'])->name('users.create')->middleware('role:ADMIN');
+    Route::post('/users', [UserManagementController::class, 'store'])->name('users.store')->middleware('role:ADMIN');
+    Route::get('/users/{user}/edit', [UserManagementController::class, 'edit'])->name('users.edit')->middleware('role:ADMIN');
+    Route::put('/users/{user}', [UserManagementController::class, 'update'])->name('users.update')->middleware('role:ADMIN');
+    Route::delete('/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy')->middleware('role:ADMIN');
 
     // Employees
     Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');

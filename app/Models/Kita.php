@@ -16,10 +16,15 @@ class Kita extends Model
         'phone',
         'email',
         'min_first_aid',
+        'min_staff_total',
+        'min_skilled_staff',
+        'notes',
     ];
 
     protected $casts = [
-        'min_first_aid' => 'integer',
+        'min_first_aid'    => 'integer',
+        'min_staff_total'  => 'integer',
+        'min_skilled_staff'=> 'integer',
     ];
 
     public function employees()
@@ -30,6 +35,11 @@ class Kita extends Model
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    public function trainingRequirements()
+    {
+        return $this->hasMany(KitaTrainingRequirement::class);
     }
 
     public function activeEmployees()
