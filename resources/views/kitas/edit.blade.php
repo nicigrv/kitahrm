@@ -83,6 +83,18 @@
                                class="w-full px-4 py-2.5 border {{ $errors->has('min_first_aid') ? 'border-red-400' : 'border-gray-300' }} rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         @error('min_first_aid') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                     </div>
+
+                    <div class="sm:col-span-3">
+                        <label for="target_weekly_hours" class="block text-sm font-medium text-gray-700 mb-1">Soll-Wochenstunden</label>
+                        <div class="relative max-w-xs">
+                            <input type="number" id="target_weekly_hours" name="target_weekly_hours"
+                                   value="{{ old('target_weekly_hours', $kita->target_weekly_hours) }}" min="0" step="0.5"
+                                   class="w-full px-4 py-2.5 pr-10 border {{ $errors->has('target_weekly_hours') ? 'border-red-400' : 'border-gray-300' }} rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">h</span>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-400">Gesamte Soll-Wochenstunden aller aktiven Mitarbeiter (0 = keine Vorgabe)</p>
+                        @error('target_weekly_hours') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
                 </div>
             </div>
 

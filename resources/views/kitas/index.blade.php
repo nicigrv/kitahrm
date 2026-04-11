@@ -61,40 +61,50 @@
             </div>
 
             <!-- Stats -->
-            <div class="px-5 py-4 grid grid-cols-3 gap-3">
-                <!-- Total Staff -->
-                <div class="text-center">
-                    @php $staffOk = $kita->min_staff_total === 0 || $item['employee_count'] >= $kita->min_staff_total; @endphp
-                    <div class="text-2xl font-bold {{ $staffOk ? 'text-gray-800' : 'text-red-600' }}">
-                        {{ $item['employee_count'] }}
-                        @if($kita->min_staff_total > 0)
-                        <span class="text-sm font-normal text-gray-400">/{{ $kita->min_staff_total }}</span>
+            <div class="px-5 py-4 grid grid-cols-2 gap-3">
+                <!-- Weekly Hours -->
+                <div>
+                    <div class="flex items-end gap-1">
+                        <span class="text-2xl font-bold {{ $item['hours_ok'] ? 'text-gray-800' : 'text-red-600' }}">
+                            {{ number_format($item['actual_hours'], 1, ',', '.') }}
+                        </span>
+                        @if($item['target_hours'] > 0)
+                        <span class="text-sm text-gray-400 mb-0.5">/{{ number_format($item['target_hours'], 1, ',', '.') }} h</span>
+                        @else
+                        <span class="text-sm text-gray-400 mb-0.5">h/Wo</span>
                         @endif
                     </div>
-                    <div class="text-xs text-gray-500 mt-0.5">Personal</div>
-                </div>
-
-                <!-- First Aid -->
-                <div class="text-center">
-                    <div class="text-2xl font-bold {{ $item['first_aid_ok'] ? 'text-green-600' : 'text-red-600' }}">
-                        {{ $item['first_aid_count'] }}
-                        @if($kita->min_first_aid > 0)
-                        <span class="text-sm font-normal text-gray-400">/{{ $kita->min_first_aid }}</span>
-                        @endif
+                    @if($item['target_hours'] > 0)
+                    <div class="mt-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        @php $pct = min(100, $item['target_hours'] > 0 ? ($item['actual_hours'] / $item['target_hours'] * 100) : 0); @endphp
+                        <div class="h-full rounded-full {{ $item['hours_ok'] ? 'bg-green-500' : 'bg-red-400' }}"
+                             style="width: {{ $pct }}%"></div>
                     </div>
-                    <div class="text-xs text-gray-500 mt-0.5">Ersthelfer</div>
-                </div>
-
-                <!-- Status indicators -->
-                <div class="flex flex-col items-center justify-center space-y-1">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $item['first_aid_ok'] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
-                        {{ $item['first_aid_ok'] ? 'EH OK' : 'EH fehlt' }}
-                    </span>
-                    @if($kita->min_staff_total > 0)
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $staffOk ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
-                        {{ $staffOk ? 'Besetzt' : 'Unterbesetzt' }}
-                    </span>
                     @endif
+                    <div class="text-xs text-gray-500 mt-1">Stunden / Woche</div>
+                </div>
+
+                <!-- First Aid + Status -->
+                <div>
+                    <div class="flex items-end gap-1">
+                        <span class="text-2xl font-bold {{ $item['first_aid_ok'] ? 'text-green-600' : 'text-red-600' }}">
+                            {{ $item['first_aid_count'] }}
+                        </span>
+                        @if($kita->min_first_aid > 0)
+                        <span class="text-sm text-gray-400 mb-0.5">/{{ $kita->min_first_aid }}</span>
+                        @endif
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">Ersthelfer</div>
+                    <div class="mt-2 flex flex-wrap gap-1">
+                        <span class="inline-flex px-1.5 py-0.5 rounded text-xs font-medium {{ $item['first_aid_ok'] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                            {{ $item['first_aid_ok'] ? 'EH ✓' : 'EH ✗' }}
+                        </span>
+                        @if($item['target_hours'] > 0)
+                        <span class="inline-flex px-1.5 py-0.5 rounded text-xs font-medium {{ $item['hours_ok'] ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
+                            {{ $item['hours_ok'] ? 'Besetzt' : 'Unterbes.' }}
+                        </span>
+                        @endif
+                    </div>
                 </div>
             </div>
 

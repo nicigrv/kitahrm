@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS `kitas` (
   `min_first_aid` int NOT NULL DEFAULT 2,
   `min_staff_total` int NOT NULL DEFAULT 0,
   `min_skilled_staff` int NOT NULL DEFAULT 0,
+  `target_weekly_hours` decimal(6,1) NOT NULL DEFAULT 0.0,
   `notes` text,
   `created_at` timestamp NULL,
   `updated_at` timestamp NULL,
@@ -171,6 +172,19 @@ CREATE TABLE IF NOT EXISTS `kita_training_requirements` (
   KEY `ktr_category_id_index` (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `kita_closing_days` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `kita_id` bigint unsigned NOT NULL,
+  `date` date NOT NULL,
+  `label` varchar(255),
+  `created_at` timestamp NULL,
+  `updated_at` timestamp NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `kcd_kita_date_unique` (`kita_id`,`date`),
+  KEY `kcd_kita_id_index` (`kita_id`),
+  CONSTRAINT `fk_kcd_kita` FOREIGN KEY (`kita_id`) REFERENCES `kitas` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `sessions` (
   `id` varchar(255) NOT NULL,
   `user_id` bigint unsigned,
@@ -217,6 +231,8 @@ SQL;
                 '2024_01_01_000006_create_training_completions_table',
                 '2024_01_01_000007_add_staffing_fields_to_kitas_table',
                 '2024_01_01_000008_create_kita_training_requirements_table',
+                '2024_01_01_000009_add_target_hours_to_kitas_table',
+                '2024_01_01_000010_create_kita_closing_days_table',
             ];
             $stmt = $pdo->prepare('INSERT IGNORE INTO `migrations` (`migration`, `batch`) VALUES (?, 1)');
             foreach ($migrations as $m) $stmt->execute([$m]);

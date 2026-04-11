@@ -58,7 +58,8 @@ class DocumentController extends Controller
             'uploaded_at' => now(),
         ]);
 
-        return redirect()->route('employees.documents.index', $employee)->with('success', 'Dokument wurde erfolgreich hochgeladen.');
+        $back = $request->input('redirect_to', route('employees.show', $employee) . '?tab=dokumente');
+        return redirect($back)->with('success', 'Dokument wurde erfolgreich hochgeladen.');
     }
 
     public function download(Employee $employee, EmployeeDocument $document)

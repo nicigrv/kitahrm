@@ -55,29 +55,79 @@
             @endif
         </div>
 
-        <!-- First Aid Status -->
-        <div class="mt-6 pt-4 border-t border-gray-100">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center {{ $firstAidOk ? 'bg-green-100' : 'bg-red-100' }}">
-                        @if($firstAidOk)
-                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        @else
-                        <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
-                        @endif
-                    </div>
-                    <div>
-                        <p class="font-medium text-sm {{ $firstAidOk ? 'text-green-800' : 'text-red-800' }}">
-                            Erste-Hilfe-Abdeckung: {{ $firstAidOk ? 'Ausreichend' : 'Nicht ausreichend' }}
-                        </p>
-                        <p class="text-xs text-gray-500">{{ $firstAidCount }} von mindestens {{ $kita->min_first_aid }} erforderlichen Ersthelfern</p>
-                    </div>
+        <!-- Stats Row -->
+        <div class="mt-6 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <!-- First Aid Status -->
+            <div class="flex items-center space-x-3 p-3 rounded-lg {{ $firstAidOk ? 'bg-green-50' : 'bg-red-50' }}">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 {{ $firstAidOk ? 'bg-green-100' : 'bg-red-100' }}">
+                    @if($firstAidOk)
+                    <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    @else
+                    <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    @endif
+                </div>
+                <div>
+                    <p class="font-medium text-sm {{ $firstAidOk ? 'text-green-800' : 'text-red-800' }}">
+                        Erste-Hilfe: {{ $firstAidOk ? 'Ausreichend' : 'Nicht ausreichend' }}
+                    </p>
+                    <p class="text-xs text-gray-500">{{ $firstAidCount }} / {{ $kita->min_first_aid }} Ersthelfer</p>
                 </div>
             </div>
+
+            <!-- Weekly Hours Status -->
+            @if($targetHours > 0)
+            <div class="p-3 rounded-lg {{ $hoursOk ? 'bg-green-50' : 'bg-amber-50' }}">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-sm font-medium {{ $hoursOk ? 'text-green-800' : 'text-amber-800' }}">
+                        Wochenstunden
+                    </span>
+                    <span class="text-sm font-bold {{ $hoursOk ? 'text-green-700' : 'text-amber-700' }}">
+                        {{ number_format($actualHours, 1, ',', '.') }} / {{ number_format($targetHours, 1, ',', '.') }} h
+                    </span>
+                </div>
+                <div class="h-2 bg-white rounded-full overflow-hidden">
+                    @php $pct = min(100, $targetHours > 0 ? ($actualHours / $targetHours * 100) : 0); @endphp
+                    <div class="h-full rounded-full {{ $hoursOk ? 'bg-green-500' : 'bg-amber-400' }}"
+                         style="width: {{ $pct }}%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">{{ $hoursOk ? 'Soll erfüllt' : 'Unterbesetzt' }}</p>
+            </div>
+            @else
+            <div class="p-3 rounded-lg bg-gray-50">
+                <p class="text-sm font-medium text-gray-600">Wochenstunden</p>
+                <p class="text-xl font-bold text-gray-800 mt-0.5">{{ number_format($actualHours, 1, ',', '.') }} h</p>
+                <p class="text-xs text-gray-400 mt-1">Kein Soll definiert</p>
+            </div>
+            @endif
+        </div>
+
+        <!-- Calendar Link -->
+        <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+            <div>
+                @if($upcomingClosingDays->isNotEmpty())
+                <p class="text-xs text-gray-500">
+                    Nächster Schließtag:
+                    <span class="font-medium text-gray-700">{{ $upcomingClosingDays->first()->date->format('d.m.Y') }}</span>
+                    @if($upcomingClosingDays->first()->label)
+                    – {{ $upcomingClosingDays->first()->label }}
+                    @endif
+                </p>
+                @else
+                <p class="text-xs text-gray-400">Keine bevorstehenden Schließtage</p>
+                @endif
+            </div>
+            <a href="{{ route('kitas.calendar', $kita) }}"
+               class="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                Schließtage-Kalender
+            </a>
         </div>
     </div>
 

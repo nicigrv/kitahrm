@@ -18,13 +18,15 @@ class Kita extends Model
         'min_first_aid',
         'min_staff_total',
         'min_skilled_staff',
+        'target_weekly_hours',
         'notes',
     ];
 
     protected $casts = [
-        'min_first_aid'    => 'integer',
-        'min_staff_total'  => 'integer',
-        'min_skilled_staff'=> 'integer',
+        'min_first_aid'       => 'integer',
+        'min_staff_total'     => 'integer',
+        'min_skilled_staff'   => 'integer',
+        'target_weekly_hours' => 'decimal:1',
     ];
 
     public function employees()
@@ -40,6 +42,16 @@ class Kita extends Model
     public function trainingRequirements()
     {
         return $this->hasMany(KitaTrainingRequirement::class);
+    }
+
+    public function closingDays()
+    {
+        return $this->hasMany(KitaClosingDay::class);
+    }
+
+    public function getActualWeeklyHoursAttribute(): float
+    {
+        return (float) $this->employees()->where('is_active', true)->sum('weekly_hours');
     }
 
     public function activeEmployees()

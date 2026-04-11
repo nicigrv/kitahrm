@@ -9,6 +9,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\TrainingCategoryController;
 use App\Http\Controllers\TrainingCompletionController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\ClosingDayController;
 
 // Auth routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -34,6 +35,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/kitas/{kita}/edit', [KitaController::class, 'edit'])->name('kitas.edit')->middleware('role:ADMIN');
     Route::put('/kitas/{kita}', [KitaController::class, 'update'])->name('kitas.update')->middleware('role:ADMIN');
     Route::delete('/kitas/{kita}', [KitaController::class, 'destroy'])->name('kitas.destroy')->middleware('role:ADMIN');
+
+    // Kita closing days / calendar
+    Route::get('/kitas/{kita}/calendar', [ClosingDayController::class, 'calendar'])->name('kitas.calendar');
+    Route::post('/kitas/{kita}/closing-days', [ClosingDayController::class, 'store'])->name('kitas.closing-days.store')->middleware('role:ADMIN,KITA_MANAGER');
+    Route::delete('/kitas/{kita}/closing-days/{closingDay}', [ClosingDayController::class, 'destroy'])->name('kitas.closing-days.destroy')->middleware('role:ADMIN,KITA_MANAGER');
 
     // User management (Admin only)
     Route::get('/users', [UserManagementController::class, 'index'])->name('users.index')->middleware('role:ADMIN');

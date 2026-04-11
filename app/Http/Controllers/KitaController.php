@@ -7,6 +7,7 @@ use App\Models\Kita;
 use App\Models\TrainingCategory;
 use App\Models\TrainingCompletion;
 use App\Models\KitaTrainingRequirement;
+use App\Models\KitaClosingDay;
 
 class KitaController extends Controller
 {
@@ -26,8 +27,9 @@ class KitaController extends Controller
         $firstAidCategories = TrainingCategory::where('is_first_aid', true)->where('is_active', true)->pluck('id');
 
         $kitaData = $kitas->map(function ($kita) use ($firstAidCategories) {
-            $activeEmployees = $kita->employees()->where('is_active', true)->get();
-            $firstAidCount   = 0;
+            $activeEmployees  = $kita->employees()->where('is_active', true)->get();
+            $actualHours      = $activeEmployees->sum('weekly_hours');
+            $firstAidCount    = 0;
             foreach ($activeEmployees as $emp) {
                 $hasValid = TrainingCompletion::where('employee_id', $emp->id)
                     ->whereIn('category_id', $firstAidCategories)
@@ -35,12 +37,15 @@ class KitaController extends Controller
                     ->exists();
                 if ($hasValid) $firstAidCount++;
             }
+            $targetHours = (float) $kita->target_weekly_hours;
             return [
                 'kita'            => $kita,
                 'employee_count'  => $activeEmployees->count(),
+                'actual_hours'    => $actualHours,
+                'target_hours'    => $targetHours,
+                'hours_ok'        => $targetHours <= 0 || $actualHours >= $targetHours,
                 'first_aid_count' => $firstAidCount,
                 'first_aid_ok'    => $firstAidCount >= $kita->min_first_aid,
-                'staff_ok'        => $kita->min_staff_total === 0 || $activeEmployees->count() >= $kita->min_staff_total,
             ];
         });
 
@@ -55,25 +60,26 @@ class KitaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'              => 'required|string|max:255',
-            'short_code'        => 'required|string|max:20|unique:kitas,short_code',
-            'address'           => 'nullable|string|max:500',
-            'phone'             => 'nullable|string|max:50',
-            'email'             => 'nullable|email|max:255',
-            'min_first_aid'     => 'required|integer|min:0',
-            'min_staff_total'   => 'required|integer|min:0',
-            'min_skilled_staff' => 'required|integer|min:0',
-            'notes'             => 'nullable|string|max:2000',
+            'name'                => 'required|string|max:255',
+            'short_code'          => 'required|string|max:20|unique:kitas,short_code',
+            'address'             => 'nullable|string|max:500',
+            'phone'               => 'nullable|string|max:50',
+            'email'               => 'nullable|email|max:255',
+            'min_first_aid'       => 'required|integer|min:0',
+            'min_staff_total'     => 'required|integer|min:0',
+            'min_skilled_staff'   => 'required|integer|min:0',
+            'target_weekly_hours' => 'required|numeric|min:0',
+            'notes'               => 'nullable|string|max:2000',
         ], [
-            'name.required'         => 'Name ist erforderlich.',
-            'short_code.required'   => 'Kurzcode ist erforderlich.',
-            'short_code.unique'     => 'Dieser Kurzcode wird bereits verwendet.',
-            'min_first_aid.required'=> 'Mindestanzahl Ersthelfer ist erforderlich.',
+            'name.required'          => 'Name ist erforderlich.',
+            'short_code.required'    => 'Kurzcode ist erforderlich.',
+            'short_code.unique'      => 'Dieser Kurzcode wird bereits verwendet.',
+            'min_first_aid.required' => 'Mindestanzahl Ersthelfer ist erforderlich.',
         ]);
 
         $kita = Kita::create($request->only([
             'name', 'short_code', 'address', 'phone', 'email',
-            'min_first_aid', 'min_staff_total', 'min_skilled_staff', 'notes',
+            'min_first_aid', 'min_staff_total', 'min_skilled_staff', 'target_weekly_hours', 'notes',
         ]));
 
         return redirect()->route('kitas.show', $kita)->with('success', 'Kita wurde erfolgreich angelegt.');
@@ -99,7 +105,10 @@ class KitaController extends Controller
             if ($hasValid) $firstAidCount++;
         }
 
-        $firstAidOk = $firstAidCount >= $kita->min_first_aid;
+        $firstAidOk  = $firstAidCount >= $kita->min_first_aid;
+        $actualHours = $employees->sum('weekly_hours');
+        $targetHours = (float) $kita->target_weekly_hours;
+        $hoursOk     = $targetHours <= 0 || $actualHours >= $targetHours;
 
         // Training requirements with current counts
         $allCategories       = TrainingCategory::where('is_active', true)->get();
@@ -119,9 +128,16 @@ class KitaController extends Controller
             return ['category' => $cat, 'min_count' => $minCount, 'current_count' => $count, 'ok' => $minCount === 0 || $count >= $minCount];
         })->filter(fn($ts) => $ts['min_count'] > 0 || $ts['current_count'] > 0);
 
-        $managers = $kita->users()->where('role', 'KITA_MANAGER')->get();
+        $managers    = $kita->users()->where('role', 'KITA_MANAGER')->get();
+        $upcomingClosingDays = $kita->closingDays()
+            ->where('date', '>=', now()->startOfDay())
+            ->orderBy('date')->limit(6)->get();
 
-        return view('kitas.show', compact('kita', 'employees', 'firstAidCount', 'firstAidOk', 'trainingStatus', 'managers'));
+        return view('kitas.show', compact(
+            'kita', 'employees', 'firstAidCount', 'firstAidOk',
+            'actualHours', 'targetHours', 'hoursOk',
+            'trainingStatus', 'managers', 'upcomingClosingDays'
+        ));
     }
 
     public function edit(Kita $kita)
@@ -142,6 +158,7 @@ class KitaController extends Controller
             'min_first_aid'          => 'required|integer|min:0',
             'min_staff_total'        => 'required|integer|min:0',
             'min_skilled_staff'      => 'required|integer|min:0',
+            'target_weekly_hours'    => 'required|numeric|min:0',
             'notes'                  => 'nullable|string|max:2000',
             'training_requirements'  => 'nullable|array',
             'training_requirements.*'=> 'nullable|integer|min:0',
@@ -154,7 +171,7 @@ class KitaController extends Controller
 
         $kita->update($request->only([
             'name', 'short_code', 'address', 'phone', 'email',
-            'min_first_aid', 'min_staff_total', 'min_skilled_staff', 'notes',
+            'min_first_aid', 'min_staff_total', 'min_skilled_staff', 'target_weekly_hours', 'notes',
         ]));
 
         // Sync training requirements
