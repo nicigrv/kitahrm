@@ -13,7 +13,7 @@ class EmployeeController extends Controller
         $userRole = session('user_role');
         $userKitaId = session('user_kita_id');
 
-        if ($userRole !== 'ADMIN' && $employee->kita_id !== $userKitaId) {
+        if ($userRole !== 'ADMIN' && (int)$employee->kita_id !== (int)$userKitaId) {
             abort(403, 'Zugriff verweigert. Dieser Mitarbeiter gehört nicht zu Ihrer Kita.');
         }
     }

@@ -81,6 +81,15 @@
                     Mitarbeiter
                 </a>
 
+                <!-- Shared Calendar -->
+                <a href="/calendar"
+                   class="{{ request()->is('calendar*') ? 'bg-indigo-800 text-white' : 'text-indigo-200 hover:bg-indigo-800 hover:text-white' }} group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Kalender
+                </a>
+
                 <!-- Training Matrix -->
                 <a href="/training"
                    class="{{ request()->is('training') ? 'bg-indigo-800 text-white' : 'text-indigo-200 hover:bg-indigo-800 hover:text-white' }} group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors">
@@ -115,7 +124,7 @@
                 </a>
 
                 <!-- System Update (admin only) -->
-                <a href="/update.php" target="_blank"
+                <a href="{{ asset('update.php') }}" target="_blank"
                    class="text-indigo-200 hover:bg-indigo-800 hover:text-white group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors">
                     <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>

@@ -69,6 +69,25 @@ function allMigrations(): array
         '2024_01_01_000009_add_target_hours_to_kitas_table' => [
             "ALTER TABLE `kitas` ADD COLUMN `target_weekly_hours` decimal(6,1) NOT NULL DEFAULT 0.0 AFTER `min_skilled_staff`",
         ],
+        '2024_01_01_000011_create_kita_events_table' => [
+            "CREATE TABLE IF NOT EXISTS `kita_events` (
+              `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+              `kita_id` bigint unsigned NOT NULL,
+              `date` date NOT NULL,
+              `end_date` date NULL,
+              `event_type` varchar(20) NOT NULL DEFAULT 'SCHLIESSTAG',
+              `title` varchar(255) NOT NULL,
+              `description` text NULL,
+              `start_time` varchar(5) NULL,
+              `end_time` varchar(5) NULL,
+              `created_at` timestamp NULL,
+              `updated_at` timestamp NULL,
+              PRIMARY KEY (`id`),
+              KEY `ke_kita_date_index` (`kita_id`,`date`),
+              KEY `ke_date_index` (`date`),
+              CONSTRAINT `fk_ke_kita` FOREIGN KEY (`kita_id`) REFERENCES `kitas` (`id`) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+        ],
         '2024_01_01_000010_create_kita_closing_days_table' => [
             "CREATE TABLE IF NOT EXISTS `kita_closing_days` (
               `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -361,7 +380,7 @@ $ghToken = $env['GITHUB_TOKEN'] ?? '';
     <div class="bg-gray-950 rounded-xl p-4 space-y-1 font-mono text-xs overflow-auto max-h-72">
       <?php foreach ($log as [$t, $m]): ?>
       <div class="flex items-start gap-2 <?= match($t) { 'ok'=>'text-green-400', 'error'=>'text-red-400', 'warn'=>'text-yellow-400', default=>'text-gray-400' } ?>">
-        <span class="flex-shrink-0"><?= match($t) { 'ok'=>'✓', 'error'=>'✗', 'warn'=>'⚠', default'=>'›' } ?></span>
+        <span class="flex-shrink-0"><?= match($t) { 'ok'=>'✓', 'error'=>'✗', 'warn'=>'⚠', default=>'›' } ?></span>
         <span><?= htmlspecialchars($m) ?></span>
       </div>
       <?php endforeach; ?>

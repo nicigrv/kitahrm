@@ -8,8 +8,14 @@
     $initTab = request('tab', 'stammdaten');
     $docCount = $employee->documents->count();
     $trainingCount = $employee->trainingCompletions->count();
-    $tenure = $employee->start_date->diff(now());
-    $tenureStr = $tenure->y > 0 ? $tenure->y . ' J. ' . $tenure->m . ' M.' : $tenure->m . ' Monate';
+    if ($employee->start_date) {
+        $tenure = $employee->start_date->diff(now());
+        $tenureStr = $tenure->y > 0
+            ? $tenure->y . ' J. ' . $tenure->m . ' Mo.'
+            : ($tenure->m > 0 ? $tenure->m . ' Monate' : $tenure->d . ' Tage');
+    } else {
+        $tenureStr = '–';
+    }
 @endphp
 <div x-data="{ tab: '{{ $initTab }}' }" class="space-y-4">
 

@@ -10,6 +10,7 @@ use App\Http\Controllers\TrainingCategoryController;
 use App\Http\Controllers\TrainingCompletionController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ClosingDayController;
+use App\Http\Controllers\KitaEventController;
 
 // Auth routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -35,6 +36,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/kitas/{kita}/edit', [KitaController::class, 'edit'])->name('kitas.edit')->middleware('role:ADMIN');
     Route::put('/kitas/{kita}', [KitaController::class, 'update'])->name('kitas.update')->middleware('role:ADMIN');
     Route::delete('/kitas/{kita}', [KitaController::class, 'destroy'])->name('kitas.destroy')->middleware('role:ADMIN');
+
+    // Global calendar (all kitas)
+    Route::get('/calendar', [KitaEventController::class, 'index'])->name('calendar.index');
+    Route::post('/calendar', [KitaEventController::class, 'store'])->name('calendar.store')->middleware('role:ADMIN,KITA_MANAGER');
+    Route::delete('/calendar/{event}', [KitaEventController::class, 'destroy'])->name('calendar.destroy')->middleware('role:ADMIN,KITA_MANAGER');
 
     // Kita closing days / calendar
     Route::get('/kitas/{kita}/calendar', [ClosingDayController::class, 'calendar'])->name('kitas.calendar');

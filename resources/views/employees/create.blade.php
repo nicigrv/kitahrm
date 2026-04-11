@@ -131,12 +131,24 @@
                         @error('weekly_hours') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="flex items-center space-x-3 cursor-pointer">
-                            <input type="hidden" name="is_active" value="0">
-                            <input type="checkbox" name="is_active" value="1" {{ old('is_active', '1') ? 'checked' : '' }}
-                                   class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                            <span class="text-sm font-medium text-gray-700">Mitarbeiter ist aktiv (Beschäftigung läuft)</span>
-                        </label>
+                        <div class="flex items-center justify-between p-3.5 bg-indigo-50 border border-indigo-100 rounded-lg">
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">Mitarbeiter ist aktiv</p>
+                                <p class="text-xs text-gray-500 mt-0.5">Beschäftigung läuft – Mitarbeiter wird in Auswertungen berücksichtigt</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
+                                <input type="hidden" name="is_active" value="0">
+                                <input type="checkbox" id="is_active" name="is_active" value="1"
+                                       {{ old('is_active', '1') ? 'checked' : '' }}
+                                       class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-indigo-600
+                                            peer-focus:ring-2 peer-focus:ring-indigo-500 peer-focus:ring-offset-1
+                                            after:content-[''] after:absolute after:top-[2px] after:left-[2px]
+                                            after:bg-white after:rounded-full after:h-5 after:w-5
+                                            after:transition-all after:shadow-sm
+                                            peer-checked:after:translate-x-5"></div>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>

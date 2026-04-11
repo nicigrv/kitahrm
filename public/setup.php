@@ -185,6 +185,24 @@ CREATE TABLE IF NOT EXISTS `kita_closing_days` (
   CONSTRAINT `fk_kcd_kita` FOREIGN KEY (`kita_id`) REFERENCES `kitas` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `kita_events` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `kita_id` bigint unsigned NOT NULL,
+  `date` date NOT NULL,
+  `end_date` date NULL,
+  `event_type` varchar(20) NOT NULL DEFAULT 'SCHLIESSTAG',
+  `title` varchar(255) NOT NULL,
+  `description` text NULL,
+  `start_time` varchar(5) NULL,
+  `end_time` varchar(5) NULL,
+  `created_at` timestamp NULL,
+  `updated_at` timestamp NULL,
+  PRIMARY KEY (`id`),
+  KEY `ke_kita_date_index` (`kita_id`,`date`),
+  KEY `ke_date_index` (`date`),
+  CONSTRAINT `fk_ke_kita` FOREIGN KEY (`kita_id`) REFERENCES `kitas` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `sessions` (
   `id` varchar(255) NOT NULL,
   `user_id` bigint unsigned,
@@ -233,6 +251,7 @@ SQL;
                 '2024_01_01_000008_create_kita_training_requirements_table',
                 '2024_01_01_000009_add_target_hours_to_kitas_table',
                 '2024_01_01_000010_create_kita_closing_days_table',
+                '2024_01_01_000011_create_kita_events_table',
             ];
             $stmt = $pdo->prepare('INSERT IGNORE INTO `migrations` (`migration`, `batch`) VALUES (?, 1)');
             foreach ($migrations as $m) $stmt->execute([$m]);
