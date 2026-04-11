@@ -1,7 +1,10 @@
 # ─── Stage 1: Dependencies ────────────────────────────────────────────────────
 FROM node:22-alpine AS deps
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# openssl must be installed before pnpm install so Prisma postinstall
+# can detect the correct OpenSSL version and download the right engine binary
+RUN apk add --no-cache openssl && \
+    corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
@@ -15,7 +18,8 @@ RUN pnpm install --frozen-lockfile
 # ─── Stage 2: Builder ─────────────────────────────────────────────────────────
 FROM node:22-alpine AS builder
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN apk add --no-cache openssl && \
+    corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
@@ -45,6 +49,9 @@ RUN pnpm build
 
 # ─── Stage 3: Runner ──────────────────────────────────────────────────────────
 FROM node:22-alpine AS runner
+
+# openssl needed by the Prisma query engine binary at runtime
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
