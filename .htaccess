@@ -1,2 +1,17 @@
+# PHP-Version für Strato (PHP 8.2)
+# Falls dein Strato-Paket PHP 8.3 nutzt, ändere die Zeile entsprechend
+AddHandler application/x-httpd-php82 .php
+
+Options -Indexes
+Options +FollowSymLinks
+
 RewriteEngine On
+
+# Statische Dateien in public/ direkt ausliefern
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f
 RewriteRule ^(.*)$ public/$1 [L]
+
+# Alles andere an public/index.php weiterleiten
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ public/index.php [L]
