@@ -69,6 +69,21 @@ function allMigrations(): array
         '2024_01_01_000009_add_target_hours_to_kitas_table' => [
             "ALTER TABLE `kitas` ADD COLUMN `target_weekly_hours` decimal(6,1) NOT NULL DEFAULT 0.0 AFTER `min_skilled_staff`",
         ],
+        '2024_01_01_000010_create_kita_closing_days_table' => [
+            "CREATE TABLE IF NOT EXISTS `kita_closing_days` (
+              `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+              `kita_id` bigint unsigned NOT NULL,
+              `date` date NOT NULL,
+              `label` varchar(255) NULL,
+              `created_at` timestamp NULL,
+              `updated_at` timestamp NULL,
+              PRIMARY KEY (`id`),
+              UNIQUE KEY `kcd_kita_date_unique` (`kita_id`,`date`),
+              KEY `kcd_kita_id_index` (`kita_id`),
+              KEY `kcd_date_index` (`date`),
+              CONSTRAINT `fk_closing_kita` FOREIGN KEY (`kita_id`) REFERENCES `kitas` (`id`) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+        ],
         '2024_01_01_000011_create_kita_events_table' => [
             "CREATE TABLE IF NOT EXISTS `kita_events` (
               `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -86,21 +101,6 @@ function allMigrations(): array
               KEY `ke_kita_date_index` (`kita_id`,`date`),
               KEY `ke_date_index` (`date`),
               CONSTRAINT `fk_ke_kita` FOREIGN KEY (`kita_id`) REFERENCES `kitas` (`id`) ON DELETE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
-        ],
-        '2024_01_01_000010_create_kita_closing_days_table' => [
-            "CREATE TABLE IF NOT EXISTS `kita_closing_days` (
-              `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-              `kita_id` bigint unsigned NOT NULL,
-              `date` date NOT NULL,
-              `label` varchar(255) NULL,
-              `created_at` timestamp NULL,
-              `updated_at` timestamp NULL,
-              PRIMARY KEY (`id`),
-              UNIQUE KEY `kcd_kita_date_unique` (`kita_id`,`date`),
-              KEY `kcd_kita_id_index` (`kita_id`),
-              KEY `kcd_date_index` (`date`),
-              CONSTRAINT `fk_closing_kita` FOREIGN KEY (`kita_id`) REFERENCES `kitas` (`id`) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
         ],
     ];

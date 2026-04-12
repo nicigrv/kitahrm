@@ -90,7 +90,7 @@ class KitaController extends Controller
         $userRole   = session('user_role');
         $userKitaId = session('user_kita_id');
 
-        if ($userRole !== 'ADMIN' && $kita->id !== $userKitaId) {
+        if ($userRole !== 'ADMIN' && (int)$kita->id !== (int)$userKitaId) {
             abort(403, 'Zugriff verweigert.');
         }
 

@@ -13,7 +13,7 @@ class ClosingDayController extends Controller
         $role   = session('user_role');
         $kitaId = session('user_kita_id');
 
-        if ($role !== 'ADMIN' && $kita->id !== $kitaId) {
+        if ($role !== 'ADMIN' && (int)$kita->id !== (int)$kitaId) {
             abort(403, 'Zugriff verweigert.');
         }
         if ($role === 'KITA_STAFF') {
@@ -25,7 +25,7 @@ class ClosingDayController extends Controller
     {
         $role   = session('user_role');
         $kitaId = session('user_kita_id');
-        if ($role !== 'ADMIN' && $kita->id !== $kitaId) abort(403);
+        if ($role !== 'ADMIN' && (int)$kita->id !== (int)$kitaId) abort(403);
 
         $year  = (int) request('year',  now()->year);
         $month = (int) request('month', now()->month);
@@ -72,7 +72,7 @@ class ClosingDayController extends Controller
     {
         $this->assertAccess($kita);
 
-        if ($closingDay->kita_id !== $kita->id) abort(404);
+        if ((int)$closingDay->kita_id !== (int)$kita->id) abort(404);
 
         $closingDay->delete();
         return back()->with('success', 'Schließtag entfernt.');
