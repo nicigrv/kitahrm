@@ -17,7 +17,7 @@ define('BASE_PATH',     realpath(__DIR__ . '/..'));
 define('ENV_PATH',      BASE_PATH . '/.env');
 define('GITHUB_REPO',   'nicigrv/kitahrm');
 define('GITHUB_BRANCH', 'main');
-define('PROTECTED',     ['.env', 'storage', 'uploads', 'public/update.php']);
+define('SKIP_PATHS',    ['.env', 'storage', 'uploads', 'public/update.php']);
 
 // ── .env parser ──────────────────────────────────────────────────────────────
 function readEnv(): array
@@ -120,7 +120,7 @@ function pendingMigrations(PDO $pdo): array
 function isProtected(string $rel): bool
 {
     $rel = str_replace('\\', '/', $rel);
-    foreach (PROTECTED as $p) {
+    foreach (SKIP_PATHS as $p) {
         if ($rel === $p || str_starts_with($rel, $p . '/')) return true;
     }
     return false;

@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `employees` (
   `phone` varchar(50),
   `address` text,
   `birth_date` date,
-  `position` varchar(255) NOT NULL,
+  `position` varchar(100) NULL,
   `start_date` date NOT NULL,
   `end_date` date,
   `contract_type` varchar(30) NOT NULL DEFAULT 'UNBEFRISTET',

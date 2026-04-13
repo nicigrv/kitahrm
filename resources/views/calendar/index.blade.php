@@ -49,7 +49,7 @@
     {{-- ── Calendar panel ─────────────────────────────────────────────── --}}
     <div class="lg:col-span-2 space-y-4">
 
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="bg-white rounded-xl shadow-sm" style="overflow:visible">
 
             {{-- Month navigation --}}
             <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
@@ -107,9 +107,29 @@
                         $cName = $kitaColorMap[$ev->kita_id] ?? 'gray';
                         $cc    = $colorClasses[$cName];
                     @endphp
-                    <div class="mt-0.5 px-1.5 py-0.5 rounded text-xs leading-tight truncate {{ $cc['bg'] }} {{ $cc['text'] }} border-l-2 {{ $cc['border'] }}"
-                         title="{{ $ev->kita->name }}: {{ $ev->title }}{{ $ev->start_time ? ' (' . $ev->start_time . ($ev->end_time ? '–' . $ev->end_time : '') . ')' : '' }}">
+                    <div class="group relative mt-0.5 px-1.5 py-0.5 rounded text-xs leading-tight truncate {{ $cc['bg'] }} {{ $cc['text'] }} border-l-2 {{ $cc['border'] }} cursor-default">
                         <span class="mr-0.5">{{ $typeIcons[$ev->event_type] ?? '' }}</span>{{ $ev->title }}
+                        {{-- Hover tooltip --}}
+                        <div class="absolute bottom-full left-0 mb-1 z-50 pointer-events-none
+                                    invisible group-hover:visible opacity-0 group-hover:opacity-100
+                                    transition-opacity duration-150
+                                    bg-gray-900 text-white rounded-lg shadow-xl px-2.5 py-2
+                                    min-w-[160px] max-w-[220px] whitespace-normal">
+                            <div class="flex items-center gap-1.5 font-semibold text-xs mb-0.5">
+                                <span class="w-2 h-2 rounded-full {{ $cc['dot'] }} flex-shrink-0"></span>
+                                <span>{{ $ev->kita->name ?? '–' }}</span>
+                            </div>
+                            <div class="text-gray-300 text-xs">{{ $typeIcons[$ev->event_type] ?? '' }} {{ $ev->type_label }}</div>
+                            @if($ev->start_time)
+                            <div class="text-gray-400 text-xs">{{ $ev->start_time }}{{ $ev->end_time ? ' – ' . $ev->end_time : '' }}</div>
+                            @endif
+                            @if($ev->end_date && $ev->end_date->ne($ev->date))
+                            <div class="text-gray-400 text-xs">{{ $ev->date->format('d.m.') }} – {{ $ev->end_date->format('d.m.Y') }}</div>
+                            @endif
+                            @if($ev->description)
+                            <div class="text-gray-400 text-xs mt-0.5 leading-snug">{{ \Str::limit($ev->description, 80) }}</div>
+                            @endif
+                        </div>
                     </div>
                     @endforeach
 
